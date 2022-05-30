@@ -151,33 +151,52 @@ class FileRepository {
     return null;
   }
 
-  Future<File?> changeAndroidBundleId({String? bundleId}) async {
-    List? contentLineByLine = await readFileAsLineByline(
+  Future<void> changeAndroidBundleId({String? bundleId}) async {
+    List? gradleContentLines = await readFileAsLineByline(
       filePath: androidAppBuildGradlePath,
     );
-    if (checkFileExists(contentLineByLine)) {
+    if (checkFileExists(gradleContentLines)) {
       logger.w('''
       Android BundleId could not be changed because,
       The related file could not be found in that path:  $androidAppBuildGradlePath
       ''');
       return null;
     }
-    for (var i = 0; i < contentLineByLine!.length; i++) {
-      final contentLine = contentLineByLine[i];
+    for (var i = 0; i < gradleContentLines!.length; i++) {
+      final contentLine = gradleContentLines[i];
       if (contentLine.contains('applicationId')) {
-        contentLineByLine[i] = '        applicationId \"$bundleId\"';
-        break;
-      } else if (contentLine.contains('package=')) {
-        contentLineByLine[i] = '        package=\"$bundleId\"';
+        gradleContentLines[i] = '        applicationId \"$bundleId\"';
         break;
       }
     }
-    var writtenFile = await writeFile(
+    await writeFile(
       filePath: androidAppBuildGradlePath,
-      content: contentLineByLine.join('\n'),
+      content: gradleContentLines.join('\n'),
     );
-    logger.i('Android bundleId changed successfully to : $bundleId');
-    return writtenFile;
+    logger.i('Android gradle.bundleId changed successfully to : $bundleId');
+    final manifestContentLines = await readFileAsLineByline(
+      filePath: androidManifestPath,
+    );
+    if (checkFileExists(manifestContentLines)) {
+      logger.w('''
+      Android Manifest.BundleId could not be changed because,
+      The related file could not be found in that path:  $androidManifestPath
+      ''');
+      return null;
+    }
+    for (var i = 0; i < manifestContentLines!.length; i++) {
+      final contentLine = manifestContentLines[i] ?? '';
+      if (contentLine.contains('package=')) {
+        manifestContentLines[i] = '        package=\"$bundleId\"';
+        break;
+      }
+    }
+    await writeFile(
+      filePath: androidManifestPath,
+      content: manifestContentLines.join('\n'),
+    );
+    logger.i('Android manifest.bundleId changed successfully to : $bundleId');
+    return null;
   }
 
   Future<String?> getLinuxBundleId() async {
