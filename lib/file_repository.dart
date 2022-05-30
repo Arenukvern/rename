@@ -217,7 +217,7 @@ class FileRepository {
       filePath: pubspecYamlPath,
       onContentLine: (contentLine) {
         if (contentLine.startsWith('name:')) {
-          return 'name: $bundleId';
+          return 'name: ${bundleId.split('.').join('_')}';
         }
         return contentLine;
       },
