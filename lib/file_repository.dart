@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:logger/logger.dart';
+import 'package:recase/recase.dart';
 
 class FileRepository {
   late Logger logger;
@@ -210,14 +211,14 @@ class FileRepository {
     return null;
   }
 
-  Future<void> changePubspec({required final String bundleId}) async {
+  Future<void> changePubspec({required final String appName}) async {
     await readWriteFile(
-      changedToInfo: bundleId,
+      changedToInfo: appName,
       fileNotExistsInfo: 'pubspec.yaml',
       filePath: pubspecYamlPath,
       onContentLine: (contentLine) {
         if (contentLine.startsWith('name:')) {
-          return 'name: ${bundleId.split('.').join('_')}';
+          return 'name: ${appName.snakeCase}';
         }
         return contentLine;
       },

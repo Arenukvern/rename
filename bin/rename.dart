@@ -48,13 +48,12 @@ void main(List<String> arguments) async {
 
     if (results[appname] != null) {
       await rename.changeAppName(results[appname], platforms);
-    }
-    if (results[bundleId] != null) {
-      await rename.changeBundleId(results[bundleId], platforms);
-
       if (results[pubspec] == true) {
         await rename.changePubspec(results[bundleId]);
       }
+    }
+    if (results[bundleId] != null) {
+      await rename.changeBundleId(results[bundleId], platforms);
     }
   } on FormatException catch (e) {
     print(e.message);
