@@ -206,12 +206,16 @@ class FileRepository {
         return contentLine;
       },
     );
-    final bundleIdDirectory = bundleId.replaceAll('.', '/');
-    final isDirectoryExists = Directory(bundleIdDirectory).existsSync();
-    final activityPath = '$bundleIdDirectory/$androidKotlinMainActivityName';
+    final bundleIdDirectory = bundleId.replaceAll('.', '\\');
+    final activityDirectoryPath =
+        '$androidKotlinFolderPath\\$bundleIdDirectory';
+    final isDirectoryExists = Directory(activityDirectoryPath).existsSync();
     if (!isDirectoryExists) {
-      Directory(bundleIdDirectory).createSync(recursive: true);
+      Directory(activityDirectoryPath).createSync(recursive: true);
     }
+
+    final activityPath =
+        '$activityDirectoryPath\\$androidKotlinMainActivityName';
 
     await readWriteFile(
       throwIfNotExists: false,
