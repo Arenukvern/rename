@@ -49,7 +49,7 @@ void main(List<String> arguments) async {
     if (results[appname] != null) {
       await rename.changeAppName(results[appname], platforms);
       if (results[pubspec] == true) {
-        await rename.changePubspec(results[bundleId]);
+        await rename.changePubspec(results[appname]);
       }
     }
     if (results[bundleId] != null) {
