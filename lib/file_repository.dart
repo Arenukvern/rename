@@ -23,6 +23,7 @@ class FileRepository {
     logger = Logger(filter: ProductionFilter());
     if (Platform.isMacOS || Platform.isLinux) {
       androidManifestPath = 'android/app/src/main/AndroidManifest.xml';
+      androidKotlinFolderPath = 'android/app/src/main/kotlin';
       iosInfoPlistPath = 'ios/Runner/Info.plist';
       androidAppBuildGradlePath = 'android/app/build.gradle';
       iosProjectPbxprojPath = 'ios/Runner.xcodeproj/project.pbxproj';
@@ -55,7 +56,7 @@ class FileRepository {
     bool throwIfNotExists = true,
   }) async {
     final contentLineByLine = readFileAsLineByline(
-      filePath: iosProjectPbxprojPath,
+      filePath: filePath,
     );
     if (throwIfNotExists && checkFileExists(contentLineByLine)) {
       logger.w('''
@@ -69,7 +70,7 @@ class FileRepository {
       contentLineByLine[i] = onContentLine(contentLine);
     }
     await writeFile(
-      filePath: iosProjectPbxprojPath,
+      filePath: filePath,
       content: contentLineByLine.join('\n'),
     );
     logger.i('$fileNotExistsInfo changed successfully to : $changedToInfo');
@@ -207,16 +208,15 @@ class FileRepository {
         return contentLine;
       },
     );
-    final bundleIdDirectory = bundleId.replaceAll('.', '\\');
-    final activityDirectoryPath =
-        '$androidKotlinFolderPath\\$bundleIdDirectory';
+    final bundleIdDirectory = bundleId.replaceAll('.', '/');
+    final activityDirectoryPath = '$androidKotlinFolderPath/$bundleIdDirectory';
     final isDirectoryExists = Directory(activityDirectoryPath).existsSync();
     if (!isDirectoryExists) {
       Directory(activityDirectoryPath).createSync(recursive: true);
     }
 
     final activityPath =
-        '$activityDirectoryPath\\$androidKotlinMainActivityName';
+        '$activityDirectoryPath/$androidKotlinMainActivityName';
 
     await readWriteFile(
       throwIfNotExists: false,
