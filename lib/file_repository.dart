@@ -7,8 +7,6 @@ class FileRepository {
   late Logger logger;
   String androidManifestPath =
       '.\\android\\app\\src\\main\\AndroidManifest.xml';
-  String androidKotlinFolderPath = '.\\android\\app\\src\\main\\kotlin';
-  String androidKotlinMainActivityName = 'MainActivity.kt';
   String iosInfoPlistPath = '.\\ios\\Runner\\Info.plist';
   String androidAppBuildGradlePath = '.\\android\\app\\build.gradle';
   String iosProjectPbxprojPath = '.\\ios\\Runner.xcodeproj\\project.pbxproj';
@@ -23,7 +21,6 @@ class FileRepository {
     logger = Logger(filter: ProductionFilter());
     if (Platform.isMacOS || Platform.isLinux) {
       androidManifestPath = 'android/app/src/main/AndroidManifest.xml';
-      androidKotlinFolderPath = 'android/app/src/main/kotlin';
       iosInfoPlistPath = 'ios/Runner/Info.plist';
       androidAppBuildGradlePath = 'android/app/build.gradle';
       iosProjectPbxprojPath = 'ios/Runner.xcodeproj/project.pbxproj';
@@ -203,28 +200,6 @@ class FileRepository {
       onContentLine: (contentLine) {
         if (contentLine.contains('package')) {
           return '        package=\"$bundleId\"';
-        }
-        return contentLine;
-      },
-    );
-    final bundleIdDirectory = bundleId.replaceAll('.', '/');
-    final activityDirectoryPath = '$androidKotlinFolderPath/$bundleIdDirectory';
-    final isDirectoryExists = Directory(activityDirectoryPath).existsSync();
-    if (!isDirectoryExists) {
-      Directory(activityDirectoryPath).createSync(recursive: true);
-    }
-
-    final activityPath =
-        '$activityDirectoryPath/$androidKotlinMainActivityName';
-
-    await readWriteFile(
-      throwIfNotExists: false,
-      changedToInfo: bundleId,
-      fileNotExistsInfo: 'Android Kotlin Activity',
-      filePath: activityPath,
-      onContentLine: (contentLine) {
-        if (contentLine.contains('package ')) {
-          return '        package $bundleId';
         }
         return contentLine;
       },
