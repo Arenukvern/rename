@@ -200,7 +200,7 @@ class FileRepository {
       fileNotExistsInfo: 'Android Manifest BundleId',
       filePath: androidManifestPath,
       onContentLine: (contentLine) {
-        if (contentLine.contains('package=')) {
+        if (contentLine.contains('package')) {
           return '        package=\"$bundleId\"';
         }
         return contentLine;
