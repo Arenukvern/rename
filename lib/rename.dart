@@ -34,6 +34,10 @@ Future changeAppName(String? appName, Iterable<Platform> platforms) async {
   }
 }
 
+Future<void> changePubspec(final String bundleId) async {
+  await fileRepository.changePubspec(bundleId: bundleId);
+}
+
 Future changeBundleId(String? bundleId, Iterable<Platform> platforms) async {
   if (platforms.isEmpty || platforms.contains(Platform.ios)) {
     await fileRepository.changeIosBundleId(bundleId: bundleId);

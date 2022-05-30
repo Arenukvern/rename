@@ -7,6 +7,7 @@ class FileRepository {
   late Logger logger;
   String androidManifestPath =
       '.\\android\\app\\src\\main\\AndroidManifest.xml';
+  String pubspecYamlPath = '.\\pubspec.yaml';
   String iosInfoPlistPath = '.\\ios\\Runner\\Info.plist';
   String androidAppBuildGradlePath = '.\\android\\app\\build.gradle';
   String iosProjectPbxprojPath = '.\\ios\\Runner.xcodeproj\\project.pbxproj';
@@ -20,6 +21,7 @@ class FileRepository {
   FileRepository() {
     logger = Logger(filter: ProductionFilter());
     if (Platform.isMacOS || Platform.isLinux) {
+      pubspecYamlPath = 'pubspec.yaml';
       androidManifestPath = 'android/app/src/main/AndroidManifest.xml';
       iosInfoPlistPath = 'ios/Runner/Info.plist';
       androidAppBuildGradlePath = 'android/app/build.gradle';
@@ -206,6 +208,20 @@ class FileRepository {
     );
 
     return null;
+  }
+
+  Future<void> changePubspec({required final String bundleId}) async {
+    await readWriteFile(
+      changedToInfo: bundleId,
+      fileNotExistsInfo: 'pubspec.yaml',
+      filePath: pubspecYamlPath,
+      onContentLine: (contentLine) {
+        if (contentLine.contains('name:')) {
+          return 'name: $bundleId';
+        }
+        return contentLine;
+      },
+    );
   }
 
   Future<String?> getLinuxBundleId() async {

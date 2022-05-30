@@ -6,6 +6,7 @@ const macOS = 'macOS';
 const ios = 'ios';
 const linux = 'linux';
 const web = 'web';
+const pubspec = 'pubspec';
 
 const target = 'target';
 const appname = 'appname';
@@ -20,6 +21,12 @@ final argParser = ArgParser()
       help: 'Set which platforms to target.')
   ..addOption(appname, abbr: 'a', help: 'Sets the name of the app.')
   ..addOption(bundleId, abbr: 'b', help: 'Sets the bundle id.')
+  ..addFlag(
+    pubspec,
+    abbr: 'p',
+    help: 'Sets the name of the app in the pubspec.yaml file.',
+    negatable: false,
+  )
   ..addFlag(help, abbr: 'h', help: 'Shows help.', negatable: false);
 
 void main(List<String> arguments) async {
@@ -44,6 +51,10 @@ void main(List<String> arguments) async {
     }
     if (results[bundleId] != null) {
       await rename.changeBundleId(results[bundleId], platforms);
+
+      if (results[pubspec] == true) {
+        await rename.changePubspec(results[bundleId]);
+      }
     }
   } on FormatException catch (e) {
     print(e.message);
