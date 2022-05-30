@@ -62,6 +62,7 @@ class FileRepository {
         return (contentLineByLine[i] as String).split('=').last.trim();
       }
     }
+    return null;
   }
 
   Future<File?> changeIosBundleId({String? bundleId}) async {
@@ -104,6 +105,7 @@ class FileRepository {
         return (contentLineByLine[i] as String).split('=').last.trim();
       }
     }
+    return null;
   }
 
   Future<File?> changeMacOsBundleId({String? bundleId}) async {
@@ -146,6 +148,7 @@ class FileRepository {
         return (contentLineByLine[i] as String).split('"').elementAt(1).trim();
       }
     }
+    return null;
   }
 
   Future<File?> changeAndroidBundleId({String? bundleId}) async {
@@ -160,8 +163,12 @@ class FileRepository {
       return null;
     }
     for (var i = 0; i < contentLineByLine!.length; i++) {
-      if (contentLineByLine[i].contains('applicationId')) {
+      final contentLine = contentLineByLine[i];
+      if (contentLine.contains('applicationId')) {
         contentLineByLine[i] = '        applicationId \"$bundleId\"';
+        break;
+      } else if (contentLine.contains('package=')) {
+        contentLineByLine[i] = '        package=\"$bundleId\"';
         break;
       }
     }
@@ -187,9 +194,9 @@ class FileRepository {
     for (var i = 0; i < contentLineByLine!.length; i++) {
       if (contentLineByLine[i].contains('set(APPLICATION_ID')) {
         return (contentLineByLine[i] as String).split('"').elementAt(1).trim();
-        ;
       }
     }
+    return null;
   }
 
   Future<File?> changeLinuxBundleId({String? bundleId}) async {
@@ -234,7 +241,7 @@ class FileRepository {
       }
     }
 
-    for (var i = 0; i < contentLineByLine!.length; i++) {
+    for (var i = 0; i < contentLineByLine.length; i++) {
       if (contentLineByLine[i].contains('<key>CFBundleDisplayName</key>')) {
         contentLineByLine[i + 1] = '\t<string>$appName</string>\r';
         break;
@@ -361,6 +368,7 @@ class FileRepository {
         return (contentLineByLine[i + 1] as String).trim().substring(5, 5);
       }
     }
+    return null;
   }
 
   // ignore: missing_return
@@ -373,13 +381,16 @@ class FileRepository {
         return (contentLineByLine[i] as String).split('"')[1];
       }
     }
+    return null;
   }
 
   bool checkFileExists(List? fileContent) {
     return fileContent == null || fileContent.isEmpty;
   }
 
-  Future<String?> getWebAppName() async {}
+  Future<String?> getWebAppName() async {
+    return null;
+  }
 
   Future<File?> changeWebAppName(String? appName) async {
     List? contentLineByLine = await readFileAsLineByline(
@@ -407,7 +418,11 @@ class FileRepository {
     return writtenFile;
   }
 
-  Future<String?> getWindowsAppName() async {}
+  Future<String?> getWindowsAppName() async {
+    return null;
+  }
 
-  Future<String?> changeWindowsAppName(String? appName) async {}
+  Future<String?> changeWindowsAppName(String? appName) async {
+    return null;
+  }
 }
