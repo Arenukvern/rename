@@ -216,7 +216,7 @@ class FileRepository {
       fileNotExistsInfo: 'pubspec.yaml',
       filePath: pubspecYamlPath,
       onContentLine: (contentLine) {
-        if (contentLine.contains('name:')) {
+        if (contentLine.startsWith('name:')) {
           return 'name: $bundleId';
         }
         return contentLine;
