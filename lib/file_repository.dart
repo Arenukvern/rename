@@ -10,6 +10,7 @@ class Paths {
     required this.androidDebugManifest,
     required this.androidManifest,
     required this.androidProfileManifest,
+    required this.androidKotlin,
     required this.iosInfoPlist,
     required this.iosProjectPbxproj,
     required this.launcherIcon,
@@ -24,7 +25,6 @@ class Paths {
     if (Platform.isMacOS || Platform.isLinux) {
       return Paths(
         pubspecYaml: 'pubspec.yaml',
-        androidManifest: 'android/app/src/main/AndroidManifest.xml',
         iosInfoPlist: 'ios/Runner/Info.plist',
         androidAppBuildGradle: 'android/app/build.gradle',
         iosProjectPbxproj: 'ios/Runner.xcodeproj/project.pbxproj',
@@ -33,17 +33,20 @@ class Paths {
         linuxCMakeLists: 'linux/CMakeLists.txt',
         linuxAppCpp: 'linux/my_application.cc',
         windowsApp: 'web/index.html',
+        androidManifest: 'android/app/src/main/AndroidManifest.xml',
         androidDebugManifest: 'android/app/src/debug/AndroidManifest.xml',
         androidProfileManifest: 'android/app/src/profile/AndroidManifest.xml',
+        androidKotlin: 'android/app/src/main/kotlin',
         webApp: 'linux/my_application.cc',
       );
     } else {
       return Paths(
-        androidManifest: '.\\android\\app\\src\\main\\AndroidManifest.xml',
+        androidManifest: '.\\android\\app\\src\\main\\kotlin',
         androidDebugManifest:
             '.\\android\\app\\src\\debug\\AndroidManifest.xml',
         androidProfileManifest:
             '.\\android\\app\\src\\profile\\AndroidManifest.xml',
+        androidKotlin: '',
         pubspecYaml: '.\\pubspec.yaml',
         iosInfoPlist: '.\\ios\\Runner\\Info.plist',
         androidAppBuildGradle: '.\\android\\app\\build.gradle',
@@ -70,6 +73,7 @@ class Paths {
   final String linuxAppCpp;
   final String webApp;
   final String windowsApp;
+  final String androidKotlin;
 }
 
 class FileRepository {
@@ -247,6 +251,9 @@ class FileRepository {
       onContentLine: (contentLine) {
         if (contentLine.contains('package')) {
           return '        package=\"$bundleId\"';
+        } else if (contentLine.contains(
+            'flutterlocalnotifications.ScheduledNotificationBootReceiver')) {
+          return '            android:name="$bundleId.flutterlocalnotifications.ScheduledNotificationBootReceiver"';
         }
         return contentLine;
       },
@@ -269,6 +276,45 @@ class FileRepository {
       onContentLine: (contentLine) {
         if (contentLine.contains('package')) {
           return '        package=\"$bundleId\"';
+        }
+        return contentLine;
+      },
+    );
+
+    // find kotlin activity
+    final files = Directory(paths.androidKotlin).listSync();
+    String findKotlinActivityPath(final List<FileSystemEntity> files) {
+      for (final file in files) {
+        final stat = file.statSync();
+        final type = stat.type;
+        final fileName = file.path.split('/').last;
+        if (type == FileSystemEntityType.directory) {
+          return findKotlinActivityPath(Directory(file.path).listSync());
+        } else if (type == FileSystemEntityType.file &&
+            fileName == 'MainActivity.kt') {
+          return file.path;
+        }
+      }
+      return '';
+    }
+
+    final kotlinFilePath = findKotlinActivityPath(files);
+    if (kotlinFilePath.isEmpty) {
+      logger.w('''
+        Kotlin Activity not found.
+        The related file could not be found in folders 
+        for that path:  ${paths.androidKotlin}
+      ''');
+      return;
+    }
+
+    await readWriteFile(
+      changedToInfo: bundleId,
+      fileNotExistsInfo: 'pubspec.yaml',
+      filePath: kotlinFilePath,
+      onContentLine: (contentLine) {
+        if (contentLine.startsWith('package')) {
+          return 'package $bundleId';
         }
         return contentLine;
       },
