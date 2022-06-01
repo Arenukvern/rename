@@ -8,6 +8,10 @@ class FileRepository {
   late Logger logger;
   String androidManifestPath =
       '.\\android\\app\\src\\main\\AndroidManifest.xml';
+  String androidDebugManifestPath =
+      '.\\android\\app\\src\\debug\\AndroidManifest.xml';
+  String androidProfileManifestPath =
+      '.\\android\\app\\src\\profile\\AndroidManifest.xml';
   String pubspecYamlPath = '.\\pubspec.yaml';
   String iosInfoPlistPath = '.\\ios\\Runner\\Info.plist';
   String androidAppBuildGradlePath = '.\\android\\app\\build.gradle';
@@ -32,6 +36,9 @@ class FileRepository {
       linuxCMakeListsPath = 'linux/CMakeLists.txt';
       linuxAppCppPath = 'linux/my_application.cc';
       windowsAppPath = 'web/index.html';
+      androidDebugManifestPath = 'android/app/src/debug/AndroidManifest.xml';
+      androidProfileManifestPath =
+          'android/app/src/profile/AndroidManifest.xml';
     }
   }
 
@@ -200,6 +207,28 @@ class FileRepository {
       changedToInfo: bundleId,
       fileNotExistsInfo: 'Android Manifest BundleId',
       filePath: androidManifestPath,
+      onContentLine: (contentLine) {
+        if (contentLine.contains('package')) {
+          return '        package=\"$bundleId\"';
+        }
+        return contentLine;
+      },
+    );
+    await readWriteFile(
+      changedToInfo: bundleId,
+      fileNotExistsInfo: 'Android Debug Manifest BundleId',
+      filePath: androidDebugManifestPath,
+      onContentLine: (contentLine) {
+        if (contentLine.contains('package')) {
+          return '        package=\"$bundleId\"';
+        }
+        return contentLine;
+      },
+    );
+    await readWriteFile(
+      changedToInfo: bundleId,
+      fileNotExistsInfo: 'Android Profile Manifest BundleId',
+      filePath: androidProfileManifestPath,
       onContentLine: (contentLine) {
         if (contentLine.contains('package')) {
           return '        package=\"$bundleId\"';
