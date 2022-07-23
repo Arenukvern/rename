@@ -246,20 +246,6 @@ class FileRepository {
 
     await readWriteFile(
       changedToInfo: bundleId,
-      fileNotExistsInfo: 'Android Manifest BundleId',
-      filePath: paths.androidManifest,
-      onContentLine: (contentLine) {
-        if (contentLine.contains('package')) {
-          return '        package=\"$bundleId\"';
-        } else if (contentLine.contains(
-            'flutterlocalnotifications.ScheduledNotificationBootReceiver')) {
-          return '            android:name="$bundleId.flutterlocalnotifications.ScheduledNotificationBootReceiver"';
-        }
-        return contentLine;
-      },
-    );
-    await readWriteFile(
-      changedToInfo: bundleId,
       fileNotExistsInfo: 'Android Debug Manifest BundleId',
       filePath: paths.androidDebugManifest,
       onContentLine: (contentLine) {
