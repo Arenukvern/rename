@@ -41,7 +41,7 @@ class Paths {
       );
     } else {
       return Paths(
-        androidManifest: '.\\android\\app\\src\\main\\kotlin',
+        androidManifest: '.\\android\\app\\src\\main\\AndroidManifest.xml',
         androidDebugManifest:
             '.\\android\\app\\src\\debug\\AndroidManifest.xml',
         androidProfileManifest:
@@ -239,6 +239,18 @@ class FileRepository {
       onContentLine: (contentLine) {
         if (contentLine.contains('applicationId')) {
           return '        applicationId \"$bundleId\"';
+        }
+        return contentLine;
+      },
+    );
+
+    await readWriteFile(
+      changedToInfo: bundleId,
+      fileNotExistsInfo: 'Android Main Manifest BundleId',
+      filePath: paths.androidManifest,
+      onContentLine: (contentLine) {
+        if (contentLine.contains('package')) {
+          return '        package=\"$bundleId\"';
         }
         return contentLine;
       },

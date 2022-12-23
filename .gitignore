@@ -7,7 +7,6 @@
 *.ipr
 *.iws
 .idea/
-
 # Remove the following pattern if you wish to check in your lock file
 pubspec.lock
 
@@ -24,3 +23,4 @@ doc/api/
 .idea/modules.xml
 .idea/vcs.xml
 rename.iml
+.DS_Store
